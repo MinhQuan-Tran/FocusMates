@@ -1,0 +1,25 @@
+/my-study-matcher
+│
+├── /components        → Reusable UI components (e.g., Header, Timer, MatchCard)
+├── /pages             → All your routes
+│   ├── index.js       → Landing page
+│   ├── login.js       → Login / signup
+│   ├── dashboard.js   → Main user dashboard
+│   ├── match.js       → Matching interface
+│   ├── session.js     → Real-time study session (chat/timer/call)
+│   └── leaderboard.js → Gamification view (optional)
+│
+├── /styles            → Your CSS files (can use plain `.css`)
+├── /lib               → Firebase config, helpers
+│   └── firebase.js    → Firebase init and exports
+│
+├── /context           → Context API for user/auth session state
+│   └── AuthContext.js
+│
+├── /hooks             → Custom React hooks (e.g., useAuth, useMatch)
+│
+├── /public            → Static assets
+│
+├── .env.local         → API keys (Firebase config)
+├── package.json
+└── README.md
