@@ -7,24 +7,24 @@ import { Popover } from '@headlessui/react';
 
 const Header: React.FC = () => {
   return (
-    <header className="w-full flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
+    <header className="w-full flex items-center justify-between px-4 py-1 border-b border-gray-200 bg-white">
       {/* Logo */}
       <div className="flex items-center gap-2">
         <Image
           src="/focusmates.svg"
           alt="FocusMates logo"
-          width={180}
-          height={38}
+          width={190}
+          height={50}
           priority
         />
       </div>
 
       {/* Desktop + Tablet Nav */}
       <nav className="hidden sm:flex gap-6 text-sm font-medium text-gray-700">
-        <Link href="/profile" className="hover:text-primary transition">
+        <Link href="/profile" className="hover:text-primary transition text-lg">
           Profile
         </Link>
-        <Link href="/leaderboard" className="hover:text-primary transition">
+        <Link href="/leaderboard" className="hover:text-primary transition text-lg">
           Leaderboard
         </Link>
       </nav>
