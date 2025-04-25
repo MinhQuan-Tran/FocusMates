@@ -1,30 +1,32 @@
+"use client";
+
 import { useEffect, useState, useContext } from "react";
-import { useRouter } from "next/router";
+import { useParams } from "next/navigation";
 import { ref, push, onValue, serverTimestamp } from "firebase/database";
 import { Timestamp } from "firebase/firestore";
 import { rtdb } from "@/firebase";
 import { AuthContext } from "@/context/AuthContext";
-import ChatBox from "@/components/ChatBox";
+import TimerBox from "@/app/session/timer/page";
+import ChatBox from "@/app/session/chat/page";
+import VideoBox from "@/app/session/video/page";
 import { SessionData, ChatMessage } from "@/types";
 
 export default function SessionPage() {
-  const router = useRouter();
-  const { sessionId } = router.query;
+  const { sessionId } = useParams();
   const { currentUser } = useContext(AuthContext);
 
   const [sessionData, setSessionData] = useState<SessionData | null>(null);
   const [chat, setChat] = useState<ChatMessage[]>([]);
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [isFocus, setIsFocus] = useState<boolean>(true);
-  const [isRunning, setIsRunning] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!currentUser) return;
+    if (!sessionId) return; // Handle the case where sessionId is not available
 
     const mockSession: SessionData = {
       matchId: "mock-match-001",
       startTime: Timestamp.now(),
-      duration: 1,
+      duration: 1, // minutes
       breakDuration: 1,
       chat: []
     };
@@ -34,7 +36,7 @@ export default function SessionPage() {
   }, [currentUser]);
 
   useEffect(() => {
-    if (!isRunning || !sessionData) return;
+    if (!sessionData) return;
 
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
@@ -48,7 +50,7 @@ export default function SessionPage() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isRunning, isFocus, sessionData]);
+  }, [isFocus, sessionData]);
 
   useEffect(() => {
     if (!sessionId || typeof sessionId !== "string") return;
@@ -75,30 +77,21 @@ export default function SessionPage() {
     });
   };
 
+  if (!sessionId) return null;
+
   return (
-    <main style={{ padding: "2rem", maxWidth: "800px", margin: "auto" }}>
-      <h1>Study Session</h1>
+    <div className="flex h-full">
+      <div className="flex-1 bg-gray-100">
+        <VideoBox sessionId={sessionId as string} userName={currentUser.displayName} />
+      </div>
+      {/* Right side - Timer + Chat */}
+      <div className="w-[400px] flex flex-col p-4 gap-4">
+        {/* Timer on top */}
+        <TimerBox totalDuration={sessionData?.duration || 0} timeLeft={timeLeft} isFocus={isFocus} />
 
-      {!sessionData ? (
-        <p>Loading session...</p>
-      ) : (
-        <>
-          <section style={{ margin: "2rem 0" }}>
-            <h2>{isFocus ? "Focus Time" : "Break Time"}</h2>
-            <p style={{ fontSize: "2rem", margin: "0.5rem 0" }}>
-              {String(Math.floor(timeLeft / 60)).padStart(2, "0")}:{String(timeLeft % 60).padStart(2, "0")}
-            </p>
-            <button onClick={() => setIsRunning(!isRunning)}>{isRunning ? "Pause" : "Start"}</button>
-            {!isFocus && (
-              <p style={{ marginTop: "1rem", fontStyle: "italic" }}>
-                Time for a short break. Relax and reset before the next focus session.
-              </p>
-            )}
-          </section>
-
-          <ChatBox chat={chat} currentUserId={currentUser.uid} onSend={handleSendMessage} />
-        </>
-      )}
-    </main>
+        {/* Chat fills remaining space */}
+        <ChatBox chat={chat} currentUserId={currentUser.uid} onSend={handleSendMessage} />
+      </div>
+    </div>
   );
 }
