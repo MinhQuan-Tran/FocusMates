@@ -58,10 +58,13 @@ export default function VideoBox({ sessionId, userName }: VideoBoxProps) {
       });
     };
 
+    const container = jitsiContainerRef.current;
     loadJitsiScript();
 
     return () => {
-      jitsiContainerRef.current!.innerHTML = "";
+      if (container) {
+        container.innerHTML = "";
+      }
     };
   }, [sessionId, userName]);
 
