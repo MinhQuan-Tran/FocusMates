@@ -55,7 +55,7 @@ export default function LeaderboardsPage() {
           href="/"
           className="inline-block mt-8 bg-primary text-white px-6 py-2 rounded-full font-medium hover:bg-primary/90 transition"
         >
-          ⬅️ Back to Home
+          ⬅️Back to Home
         </Link>
       </main>
     </div>
