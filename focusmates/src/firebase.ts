@@ -1,5 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { getDatabase } from "firebase/database";
+import { getAuth } from "firebase/auth";
 import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -17,10 +20,17 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider("6Ldq_iIrAAAAABzkCR0ASLL7u5QfVW8AMbVpALPN"),
+if (typeof window !== "undefined") {
+  // Only in dev
+  // @ts-expect-error: Firebase App Check debug token is not typed
+  self.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
 
-  // Optional argument. If true, the SDK automatically refreshes App Check
-  // tokens as needed.
-  isTokenAutoRefreshEnabled: true
-});
+  initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider("6Ldq_iIrAAAAABzkCR0ASLL7u5QfVW8AMbVpALPN"),
+    isTokenAutoRefreshEnabled: true
+  });
+}
+
+export const db = getFirestore(app);
+export const rtdb = getDatabase(app, "https://focusmates-default-rtdb.asia-southeast1.firebasedatabase.app");
+export const auth = getAuth(app);
