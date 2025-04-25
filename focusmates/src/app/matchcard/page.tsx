@@ -1,3 +1,6 @@
+// src/app/matchcard/page.tsx
+"use client";
+
 import MatchCard from "@/components/MatchCard";
 
 export default function MatchCardPage() {
