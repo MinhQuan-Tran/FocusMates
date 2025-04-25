@@ -9,7 +9,7 @@ export default function MatchCardPage() {
       <h1 className="text-2xl font-semibold mb-4">Your Matches</h1>
 
       <MatchCard
-        name="Alice"
+        name="Alice1"
         degree="Computer Science"
         skills={["Python", "AI", "Databases"]}
         onInvite={() => alert("Invited Alice")}
