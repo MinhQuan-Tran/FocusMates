@@ -19,3 +19,9 @@ export interface ChatBoxProps {
   currentUserId: string;
   onSend: (msg: string) => void;
 }
+
+export interface TimerBoxProps {
+  totalDuration: number;
+  timeLeft: number;
+  isFocus: boolean;
+}
