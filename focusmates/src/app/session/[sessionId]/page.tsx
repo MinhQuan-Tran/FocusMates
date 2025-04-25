@@ -33,7 +33,7 @@ export default function SessionPage() {
 
     setSessionData(mockSession);
     setTimeLeft(mockSession.duration * 60);
-  }, [currentUser]);
+  }, [sessionId]);
 
   useEffect(() => {
     if (!sessionData) return;
