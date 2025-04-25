@@ -1,32 +1,23 @@
-// components/MatchCard.tsx
-import React from "react";
+import MatchCard from "@/components/MatchCard";
 
-interface MatchCardProps {
-  name: string;
-  degree: string;
-  skills: string[];
-  onInvite: () => void;
+export default function MatchCardPage() {
+  return (
+    <main className="p-6">
+      <h1 className="text-2xl font-semibold mb-4">Your Matches</h1>
+
+      <MatchCard
+        name="Alice"
+        degree="Computer Science"
+        skills={["Python", "AI", "Databases"]}
+        onInvite={() => alert("Invited Alice")}
+      />
+
+      <MatchCard
+        name="Bob"
+        degree="Software Engineering"
+        skills={["JavaScript", "React", "Node.js"]}
+        onInvite={() => alert("Invited Bob")}
+      />
+    </main>
+  );
 }
-
-const MatchCardPage: React.FC<MatchCardProps> = ({ name, degree, skills, onInvite }) => (
-  <div
-    style={{
-      border: "1px solid #ddd",
-      padding: "1rem",
-      borderRadius: "8px",
-      marginBottom: "1rem",
-      background: "#fff"
-    }}
-  >
-    <h3 style={{ marginBottom: 0 }}>{name}</h3>
-    <p>
-      <strong>Degree:</strong> {degree}
-    </p>
-    <p>
-      <strong>Skills:</strong> {skills.join(", ")}
-    </p>
-    <button onClick={onInvite}>Invite to Study</button>
-  </div>
-);
-
-export default MatchCardPage;

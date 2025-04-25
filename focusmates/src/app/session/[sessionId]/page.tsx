@@ -6,9 +6,9 @@ import { ref, push, onValue, serverTimestamp } from "firebase/database";
 import { Timestamp } from "firebase/firestore";
 import { rtdb } from "@/firebase";
 import { AuthContext } from "@/context/AuthContext";
-import TimerBox from "@/app/session/timer/page";
-import ChatBox from "@/app/session/chat/page";
-import VideoBox from "@/app/session/video/page";
+import TimerBox from "@/components/TimerBox";
+import ChatBox from "@/components/ChatBox";
+import VideoBox from "@/components/VideoBox";
 import { SessionData, ChatMessage } from "@/types";
 
 export default function SessionPage() {
