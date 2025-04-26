@@ -5,12 +5,12 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get("authToken"); // Replace with your actual auth token logic
 
   // Define protected routes
-  const protectedRoutes = ["/dashboard", "/session", "/profile"];
+  const protectedRoutes = ["/dashboard", "/session", "/profile", "/match"]; // Added "/match"
 
   // Check if the user is trying to access a protected route
   if (protectedRoutes.some((route) => request.nextUrl.pathname.startsWith(route))) {
     if (!token) {
-      // Redirect to the landing page if not authenticated
+      // Redirect to the login page if not authenticated
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }
@@ -21,5 +21,5 @@ export function middleware(request: NextRequest) {
 
 // Specify the routes where the middleware should run
 export const config = {
-  matcher: ["/dashboard/:path*", "/session/:path*", "/profile/:path*"] // Adjust paths as needed
+  matcher: ["/dashboard/:path*", "/session/:path*", "/profile/:path*", "/match"]
 };

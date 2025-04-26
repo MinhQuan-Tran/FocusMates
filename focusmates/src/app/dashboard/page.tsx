@@ -9,10 +9,10 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-xl shadow-md mt-10 font-sans">
-      <h1 className="text-3xl font-semibold text-gray-900 mb-2">
-        Welcome, {currentUser.name} 👋
-      </h1>
-      <p className="text-sm text-gray-600 mb-4">{currentUser.email} — {currentUser.degree}</p>
+      <h1 className="text-3xl font-semibold text-gray-900 mb-2">Welcome, {currentUser.name} 👋</h1>
+      <p className="text-sm text-gray-600 mb-4">
+        {currentUser.email} — {currentUser.degree}
+      </p>
 
       <div className="flex items-center gap-6 mt-4 mb-6">
         <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-medium">
@@ -27,10 +27,7 @@ export default function DashboardPage() {
         <h2 className="text-lg font-semibold mb-2">Your Skills</h2>
         <div className="flex flex-wrap gap-2">
           {currentUser.skills.map((skill, index) => (
-            <span
-              key={index}
-              className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium"
-            >
+            <span key={index} className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
               {skill}
             </span>
           ))}

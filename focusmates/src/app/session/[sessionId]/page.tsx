@@ -2,8 +2,7 @@
 
 import { useEffect, useState, useContext } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ref, push, onValue, serverTimestamp } from "firebase/database";
-import { Timestamp } from "firebase/firestore";
+import { ref, get, push, onValue, serverTimestamp } from "firebase/database";
 import { rtdb } from "@/firebase";
 import { AuthContext } from "@/context/AuthContext";
 import TimerBox from "@/components/TimerBox";
@@ -18,32 +17,62 @@ export default function SessionPage() {
   const { currentUser, loading } = useContext(AuthContext);
 
   const [sessionData, setSessionData] = useState<SessionData | null>(null);
+  const [matchData, setMatchData] = useState<any | null>(null);
+  const [participants, setParticipants] = useState<any[]>([]);
   const [chat, setChat] = useState<ChatMessage[]>([]);
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [isFocus, setIsFocus] = useState<boolean>(true);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
+  // Redirect to login if not authenticated
   useEffect(() => {
     if (!loading && !currentUser) {
       router.push("/login");
     }
   }, [currentUser, loading, router]);
 
+  // Fetch session data
   useEffect(() => {
     if (!sessionId) return;
 
-    const mockSession: SessionData = {
-      matchId: "mock-match-001",
-      startTime: Timestamp.now(),
-      duration: 1,
-      breakDuration: 1,
-      chat: []
-    };
+    const sessionRef = ref(rtdb, `sessions/${sessionId}`);
+    get(sessionRef).then((snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        setSessionData(data);
+        setTimeLeft(data.duration * 60); // Set initial time left
+      } else {
+        alert("Session not found.");
+        router.push("/");
+      }
+    });
+  }, [sessionId, router]);
 
-    setSessionData(mockSession);
-    setTimeLeft(mockSession.duration * 60);
-  }, [sessionId]);
+  // Fetch match data and participants
+  useEffect(() => {
+    if (!sessionData?.matchId) return;
 
+    const matchRef = ref(rtdb, `matches/${sessionData.matchId}`);
+    get(matchRef).then((snapshot) => {
+      if (snapshot.exists()) {
+        const match = snapshot.val();
+        setMatchData(match);
+
+        // Fetch participant user info
+        const userPromises = match.users.map(async (userId: string) => {
+          const userRef = ref(rtdb, `users/${userId}`);
+          const userSnapshot = await get(userRef);
+          return userSnapshot.exists() ? userSnapshot.val() : null;
+        });
+
+        Promise.all(userPromises).then((users) => {
+          setParticipants(users.filter((user) => user !== null)); // Filter out null values
+        });
+      }
+    });
+  }, [sessionData]);
+
+  // Timer logic
   useEffect(() => {
     if (!sessionData) return;
 
@@ -61,6 +90,7 @@ export default function SessionPage() {
     return () => clearInterval(interval);
   }, [isFocus, sessionData]);
 
+  // Fetch chat messages
   useEffect(() => {
     if (!sessionId || typeof sessionId !== "string") return;
 
@@ -75,6 +105,7 @@ export default function SessionPage() {
     return () => unsubscribe();
   }, [sessionId]);
 
+  // Handle sending chat messages
   const handleSendMessage = async (newMessage: string) => {
     if (!newMessage.trim() || !sessionId || typeof sessionId !== "string" || !currentUser) return;
 
@@ -93,14 +124,14 @@ export default function SessionPage() {
   if (!sessionId || !currentUser) return null;
 
   return (
-    <div className="w-full h-full relative flex flex-col md:flex-row gap-2 p-2">
+    <div className="w-full h-full relative flex flex-col items-stretch md:flex-row gap-2 p-2">
       {/* Video Section */}
       <div className="w-full md:h-auto md:flex-1 bg-transparent">
         <VideoBox sessionId={sessionId as string} userName={currentUser.displayName || "User"} />
       </div>
 
       {/* Right Panel for desktop */}
-      <div className="hidden md:flex w-[400px] flex-col gap-2 bg-transparent">
+      <div className="hidden md:flex w-[400px] flex-col items-stretch gap-2 bg-transparent">
         <TimerBox totalDuration={sessionData?.duration || 0} timeLeft={timeLeft} isFocus={isFocus} />
         <ChatBox chat={chat} currentUserId={currentUser.uid} onSend={handleSendMessage} />
       </div>

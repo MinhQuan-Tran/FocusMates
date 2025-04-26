@@ -1,63 +1,59 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore"; // Import Firestore functions
-import { auth, db } from "../../../src/firebase"; // Adjust if needed
-import { useAuth } from "../../context/AuthContext";
-import { setCookie } from "cookies-next"; // Import cookies-next for setting cookies
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../../../src/firebase";
+import { setCookie } from "cookies-next";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { currentUser } = useAuth(); // Access the current user
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams?.get("redirect") || "/dashboard";
+  const { currentUser, loading } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [displayName, setDisplayName] = useState(""); // New state for displayName
+  const [displayName, setDisplayName] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState("");
 
-  const handleAuth = async (e: React.FormEvent) => {
+  // Redirect if the user is already logged in
+  if (!loading && currentUser) {
+    router.push(redirectUrl);
+    return null; // Prevent rendering the login form
+  }
+
+  const handleAuth = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
 
     try {
       let userCredential;
       if (isSignUp) {
-        // Create user with email and password
         userCredential = await createUserWithEmailAndPassword(auth, email, password);
-
-        // Get the user's UID
         const uid = userCredential.user.uid;
 
-        // Store additional user data in Firestore
         await setDoc(doc(db, "users", uid), {
-          email: email,
-          displayName: displayName, // Save the displayName
+          email,
+          displayName,
           createdAt: new Date(),
           skills: [],
           streak: 0,
           points: 0
         });
       } else {
-        // Sign in existing user
         userCredential = await signInWithEmailAndPassword(auth, email, password);
       }
 
-      // Get the user's ID token
       const token = await userCredential.user.getIdToken();
+      setCookie("authToken", token, { maxAge: 60 * 60 * 24 });
 
-      // Set the token in cookies
-      setCookie("authToken", token, { maxAge: 60 * 60 * 24 }); // Token valid for 1 day
-
-      // Redirect to the dashboard
-      router.push("/dashboard");
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Something went wrong");
-      }
+      router.push(redirectUrl);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
     }
   };
 
@@ -87,12 +83,6 @@ export default function LoginPage() {
           </text>
         </svg>
       </div>
-
-      {currentUser && (
-        <p style={{ marginBottom: "1rem", color: "#2F2F2F" }}>
-          Welcome, <strong>{currentUser.displayName ?? currentUser.email}</strong>!
-        </p>
-      )}
 
       <h1 style={{ fontSize: "1.8rem", marginBottom: "1rem", color: "#2F2F2F" }}>{isSignUp ? "Sign Up" : "Sign In"}</h1>
 

@@ -47,7 +47,7 @@ export default function ChatBox({ chat, currentUserId, onSend }: ChatBoxProps) {
   };
 
   return (
-    <div className="w-full max-w-md h-[38vh] flex flex-col border border-gray-300 rounded-lg overflow-hidden bg-white shadow">
+    <div className="w-full max-w-md h-full flex flex-col border border-gray-300 rounded-lg overflow-hidden bg-white shadow">
       {/* Chat log */}
       <div className="flex flex-col flex-1 p-4 overflow-y-auto gap-4 bg-white">
         {chat.map((msg, index) => {

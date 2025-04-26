@@ -2,66 +2,30 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore"; // Import Firestore functions
-import { auth, db } from "../firebase"; // Adjust the path to your Firebase configuration
-import { User } from "@/types";
+import { auth } from "../firebase";
 
 interface AuthContextType {
-  currentUser: User | null;
-  loading: boolean; // Add loading state to the context
+  currentUser: FirebaseUser | null;
+  loading: boolean;
 }
 
 export const AuthContext = createContext<AuthContextType>({
   currentUser: null,
-  loading: true // Default loading state
+  loading: true
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user: FirebaseUser | null) => {
-      console.log("Auth state changed:", user); // Debugging
-      if (user) {
-        try {
-          // Fetch additional user data from Firestore
-          const userDocRef = doc(db, "users", user.uid);
-          const userDoc = await getDoc(userDocRef);
-
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            setCurrentUser({
-              uid: user.uid,
-              email: user.email,
-              displayName: user.displayName,
-              ...userData // Merge Firestore data with the current user
-            });
-          } else {
-            console.warn("No user document found in Firestore for UID:", user.uid);
-            setCurrentUser({
-              uid: user.uid,
-              email: user.email,
-              displayName: user.displayName
-            });
-          }
-        } catch (error) {
-          console.error("Error fetching user data from Firestore:", error);
-          setCurrentUser({
-            uid: user.uid,
-            email: user.email,
-            displayName: user.displayName
-          });
-        }
-      } else {
-        setCurrentUser(null);
-      }
-      setLoading(false); // Set loading to false after auth state is determined
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      setLoading(false); // Set loading to false only after the auth state is resolved
     });
 
-    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
 
