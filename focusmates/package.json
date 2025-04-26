@@ -2,6 +2,7 @@
   "name": "focusmates",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -14,7 +15,8 @@
     "lucide-react": "^0.503.0",
     "next": "15.3.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-firebase-hooks": "^5.1.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
