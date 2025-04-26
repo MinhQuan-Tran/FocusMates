@@ -14,7 +14,7 @@ export default function LeaderboardsPage() {
     onValue(usersRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        const parsedData = Object.entries(data).map(([userId, userInfo]) => ({
+        const parsedData = Object.entries(data).map(([_, userInfo]) => ({
           name: userInfo.username,
           skill: userInfo.skills.join(', '),
           sessions: userInfo.numberOfSessions,
