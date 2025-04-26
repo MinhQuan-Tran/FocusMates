@@ -113,13 +113,19 @@ export default function Home() {
 
         {/* Input and Button */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <input
-            type="text"
-            placeholder="e.g. Python, Marketing, Math..."
-            value={skill}
-            onChange={(e) => setSkill(e.target.value)}
-            className="w-full sm:w-80 px-4 py-2 border rounded-full text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary"
-          />
+        <input
+          type="text"
+          placeholder="e.g. Python, Marketing, Math..."
+          value={skill}
+          onChange={(e) => setSkill(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !loading) {
+              e.preventDefault(); // prevent accidental form submit
+              handleMatch();
+            }
+          }}
+          className="w-full sm:w-80 px-4 py-2 border rounded-full text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary"
+        />
           <button
             onClick={handleMatch}
             className="bg-primary text-white px-6 py-2 rounded-full font-medium hover:bg-primary/90 transition disabled:opacity-50"
