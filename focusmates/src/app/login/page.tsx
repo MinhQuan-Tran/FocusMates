@@ -1,35 +1,68 @@
 "use client";
 
+import { Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../../src/firebase"; // Adjust if needed
-// import { useAuth } from "../../context/AuthContext";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../../../src/firebase";
+import { setCookie } from "cookies-next";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams?.get("redirect") || "/dashboard";
+  const { currentUser, loading } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState("");
 
-  const handleAuth = async (e: React.FormEvent) => {
+  // Redirect if the user is already logged in
+  if (!loading && currentUser) {
+    router.push(redirectUrl);
+    return null; // Prevent rendering the login form
+  }
+
+  const handleAuth = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
 
     try {
+      let userCredential;
       if (isSignUp) {
-        await createUserWithEmailAndPassword(auth, email, password);
+        userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const uid = userCredential.user.uid;
+
+        await setDoc(doc(db, "users", uid), {
+          email,
+          displayName,
+          createdAt: new Date(),
+          skills: [],
+          streak: 0,
+          points: 0
+        });
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
+        userCredential = await signInWithEmailAndPassword(auth, email, password);
       }
-      router.push("/dashboard");
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Something went wrong");
-      }
+
+      const token = await userCredential.user.getIdToken();
+      setCookie("authToken", token, { maxAge: 60 * 60 * 24 });
+
+      router.push(redirectUrl);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
     }
   };
 
@@ -63,6 +96,19 @@ export default function LoginPage() {
       <h1 style={{ fontSize: "1.8rem", marginBottom: "1rem", color: "#2F2F2F" }}>{isSignUp ? "Sign Up" : "Sign In"}</h1>
 
       <form onSubmit={handleAuth}>
+        {isSignUp && (
+          <>
+            <label style={labelStyle}>Display Name</label>
+            <input
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              required
+              style={inputStyle}
+            />
+          </>
+        )}
+
         <label style={labelStyle}>Email</label>
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={inputStyle} />
 

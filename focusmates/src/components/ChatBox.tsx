@@ -18,8 +18,11 @@ export default function ChatBox({ chat, currentUserId, onSend }: ChatBoxProps) {
           try {
             const userRef = doc(db, "users", uid);
             const snapshot = await getDoc(userRef);
-            const name = snapshot.data()?.name;
-            updates[uid] = name?.trim() || "Unknown User";
+
+            console.log("User snapshot:", snapshot.data()); // Debugging
+
+            const displayName = snapshot.data()?.displayName;
+            updates[uid] = displayName?.trim() || "Unknown User";
           } catch {
             updates[uid] = "Unknown User";
           }
@@ -44,7 +47,7 @@ export default function ChatBox({ chat, currentUserId, onSend }: ChatBoxProps) {
   };
 
   return (
-    <div className="w-full max-w-md h-[38vh] flex flex-col border border-gray-300 rounded-lg overflow-hidden bg-white shadow">
+    <div className="w-full max-w-md h-full flex flex-col border border-gray-300 rounded-lg overflow-hidden bg-white shadow">
       {/* Chat log */}
       <div className="flex flex-col flex-1 p-4 overflow-y-auto gap-4 bg-white">
         {chat.map((msg, index) => {

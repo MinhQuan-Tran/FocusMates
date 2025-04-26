@@ -1,5 +1,15 @@
 import { Timestamp } from "firebase/firestore";
 
+export interface User {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  degree?: string;
+  skills?: string[];
+  streak?: number;
+  points?: number;
+}
+
 export interface SessionData {
   matchId: string;
   startTime: Timestamp;

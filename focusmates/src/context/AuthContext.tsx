@@ -1,37 +1,33 @@
-import { createContext, useContext } from "react";
+"use client";
 
-export interface User {
-  uid: string;
-  email: string;
-  displayName: string;
-  name: string;
-  degree: string;
-  skills: string[];
-  streak: number;
-  points: number;
-}
+import { createContext, useContext, useEffect, useState } from "react";
+import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
+import { auth } from "../firebase";
 
 interface AuthContextType {
-  currentUser: User;
+  currentUser: FirebaseUser | null;
+  loading: boolean;
 }
 
-const mockUser: User = {
-  uid: "mock-user-123",
-  email: "mockuser@example.com",
-  displayName: "Alice",
-  name: "Alice",
-  degree: "CompSci",
-  skills: ["Python", "AI"],
-  streak: 3,
-  points: 120
-};
-
 export const AuthContext = createContext<AuthContextType>({
-  currentUser: mockUser
+  currentUser: null,
+  loading: true
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  return <AuthContext.Provider value={{ currentUser: mockUser }}>{children}</AuthContext.Provider>;
+  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      setLoading(false); // Set loading to false only after the auth state is resolved
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  return <AuthContext.Provider value={{ currentUser, loading }}>{children}</AuthContext.Provider>;
 };
