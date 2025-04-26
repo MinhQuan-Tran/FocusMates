@@ -9,7 +9,7 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-xl shadow-md mt-10 font-sans">
-      <h1 className="text-3xl font-semibold text-gray-900 mb-2">Welcome, {currentUser.name} 👋</h1>
+      {/* <h1 className="text-3xl font-semibold text-gray-900 mb-2">Welcome, {currentUser.name} 👋</h1>
       <p className="text-sm text-gray-600 mb-4">
         {currentUser.email} — {currentUser.degree}
       </p>
@@ -47,7 +47,7 @@ export default function DashboardPage() {
         >
           ⏱ Start Session
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }
