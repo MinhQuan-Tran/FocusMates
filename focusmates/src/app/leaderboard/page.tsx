@@ -2,27 +2,41 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ref, onValue } from "firebase/database";
-import { rtdb } from '@/firebase'; // Your firebase.js config
+import { ref, onValue } from 'firebase/database';
+import { rtdb } from '@/firebase';
 
+type UserInfo = {
+  username: string;
+  skills: string[];
+  numberOfSessions: number;
+};
+
+type LeaderboardEntry = {
+  id: string;
+  name: string;
+  skill: string;
+  sessions: number;
+};
 
 export default function LeaderboardsPage() {
-  const [leaderboardData, setLeaderboardData] = useState([]);
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([]);
 
   useEffect(() => {
     const usersRef = ref(rtdb, 'users');
     onValue(usersRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        const parsedData = Object.entries(data).map(([_, userInfo]) => ({
-          name: userInfo.username,
-          skill: userInfo.skills.join(', '),
-          sessions: userInfo.numberOfSessions,
-        }));
+        const parsedData = Object.entries(data).map(([userId, userInfo]) => {
+          const user = userInfo as UserInfo;
+          return {
+            id: userId,
+            name: user.username,
+            skill: user.skills.join(', '),
+            sessions: user.numberOfSessions,
+          };
+        });
 
-        // Optional: sort by sessions descending
         parsedData.sort((a, b) => b.sessions - a.sessions);
-
         setLeaderboardData(parsedData);
       }
     });
@@ -30,9 +44,7 @@ export default function LeaderboardsPage() {
 
   return (
     <div className="bg-focusmate w-full h-screen flex flex-col items-center justify-center px-4">
-    <main className="max-w-3xl w-full text-center space-y-8 overflow-y-auto h-[90vh] p-4">
-
-
+      <main className="max-w-3xl w-full text-center space-y-8 overflow-y-auto h-[90vh] p-4">
         {/* Heading */}
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
           🏆 Top <span className="text-primary">FocusMates</span> of the Week
@@ -56,7 +68,7 @@ export default function LeaderboardsPage() {
             </thead>
             <tbody className="text-gray-700">
               {leaderboardData.map((user, index) => (
-                <tr key={index} className="even:bg-gray-100">
+                <tr key={user.id} className="even:bg-gray-100">
                   <td className="px-6 py-4 font-semibold">{index + 1}</td>
                   <td className="px-6 py-4">{user.name}</td>
                   <td className="px-6 py-4">{user.skill}</td>
@@ -69,12 +81,11 @@ export default function LeaderboardsPage() {
 
         {/* Back to home link */}
         <Link
-        href="/"
-        className="float-right mt-8 bg-primary text-white px-6 py-2 rounded-full font-medium hover:bg-primary/90 transition"
+          href="/"
+          className="float-right mt-8 bg-primary text-white px-6 py-2 rounded-full font-medium hover:bg-primary/90 transition"
         >
-        ⬅️Back to Home
+          ⬅️ Back to Home
         </Link>
-
       </main>
     </div>
   );

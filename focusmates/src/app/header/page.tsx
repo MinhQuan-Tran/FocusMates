@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Popover } from '@headlessui/react';
+import { Popover } from '@headlessui/react'; // Popover for mobile menu
 import { usePathname } from 'next/navigation';
 
 const Header: React.FC = () => {
