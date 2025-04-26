@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import MatchCard from '@/components/MatchCard'; // assuming you already have MatchCard
 import Link from 'next/link';
 
 export default function ProfilePage() {
