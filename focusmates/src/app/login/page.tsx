@@ -3,13 +3,17 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../../src/firebase"; // Adjust if needed
-// import { useAuth } from "../../context/AuthContext";
+import { doc, setDoc } from "firebase/firestore"; // Import Firestore functions
+import { auth, db } from "../../../src/firebase"; // Adjust if needed
+import { useAuth } from "../../context/AuthContext";
+import { setCookie } from "cookies-next"; // Import cookies-next for setting cookies
 
 export default function LoginPage() {
   const router = useRouter();
+  const { currentUser } = useAuth(); // Access the current user
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState(""); // New state for displayName
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState("");
 
@@ -18,11 +22,35 @@ export default function LoginPage() {
     setError("");
 
     try {
+      let userCredential;
       if (isSignUp) {
-        await createUserWithEmailAndPassword(auth, email, password);
+        // Create user with email and password
+        userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+        // Get the user's UID
+        const uid = userCredential.user.uid;
+
+        // Store additional user data in Firestore
+        await setDoc(doc(db, "users", uid), {
+          email: email,
+          displayName: displayName, // Save the displayName
+          createdAt: new Date(),
+          skills: [],
+          streak: 0,
+          points: 0
+        });
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
+        // Sign in existing user
+        userCredential = await signInWithEmailAndPassword(auth, email, password);
       }
+
+      // Get the user's ID token
+      const token = await userCredential.user.getIdToken();
+
+      // Set the token in cookies
+      setCookie("authToken", token, { maxAge: 60 * 60 * 24 }); // Token valid for 1 day
+
+      // Redirect to the dashboard
       router.push("/dashboard");
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -60,9 +88,28 @@ export default function LoginPage() {
         </svg>
       </div>
 
+      {currentUser && (
+        <p style={{ marginBottom: "1rem", color: "#2F2F2F" }}>
+          Welcome, <strong>{currentUser.displayName ?? currentUser.email}</strong>!
+        </p>
+      )}
+
       <h1 style={{ fontSize: "1.8rem", marginBottom: "1rem", color: "#2F2F2F" }}>{isSignUp ? "Sign Up" : "Sign In"}</h1>
 
       <form onSubmit={handleAuth}>
+        {isSignUp && (
+          <>
+            <label style={labelStyle}>Display Name</label>
+            <input
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              required
+              style={inputStyle}
+            />
+          </>
+        )}
+
         <label style={labelStyle}>Email</label>
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={inputStyle} />
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useContext } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { ref, push, onValue, serverTimestamp } from "firebase/database";
 import { Timestamp } from "firebase/firestore";
 import { rtdb } from "@/firebase";
@@ -14,13 +14,20 @@ import { MessageSquare } from "lucide-react";
 
 export default function SessionPage() {
   const { sessionId } = useParams();
-  const { currentUser } = useContext(AuthContext);
+  const router = useRouter();
+  const { currentUser, loading } = useContext(AuthContext);
 
   const [sessionData, setSessionData] = useState<SessionData | null>(null);
   const [chat, setChat] = useState<ChatMessage[]>([]);
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [isFocus, setIsFocus] = useState<boolean>(true);
   const [isChatOpen, setIsChatOpen] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !currentUser) {
+      router.push("/login");
+    }
+  }, [currentUser, loading, router]);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -79,23 +86,23 @@ export default function SessionPage() {
     });
   };
 
-  if (!sessionId) return null;
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading spinner or placeholder
+  }
+
+  if (!sessionId || !currentUser) return null;
 
   return (
-    <div className=" w-full min-h-screen relative flex flex-col md:flex-row ">
+    <div className="w-full h-full relative flex flex-col md:flex-row gap-2 p-2">
       {/* Video Section */}
-      <div className=" w-full h-screen md:h-auto md:flex-1 bg-transparent p-4">
-        <VideoBox sessionId={sessionId as string} userName={currentUser.displayName} />
+      <div className="w-full md:h-auto md:flex-1 bg-transparent">
+        <VideoBox sessionId={sessionId as string} userName={currentUser.displayName || "User"} />
       </div>
-
 
       {/* Right Panel for desktop */}
-      <div className=" hidden md:flex w-[400px] flex-col p-4 gap-4 bg-transparent">
+      <div className="hidden md:flex w-[400px] flex-col gap-2 bg-transparent">
         <TimerBox totalDuration={sessionData?.duration || 0} timeLeft={timeLeft} isFocus={isFocus} />
-      <div className="flex-1 overflow-hidden flex flex-col">
         <ChatBox chat={chat} currentUserId={currentUser.uid} onSend={handleSendMessage} />
-      </div>
-
       </div>
 
       {/* Mobile floating TimerBox and Chat button */}
@@ -111,10 +118,7 @@ export default function SessionPage() {
         </div>
 
         {/* Chat Toggle Button */}
-        <button
-          onClick={() => setIsChatOpen((prev) => !prev)}
-          className="bg-white shadow-lg rounded-full p-2"
-        >
+        <button onClick={() => setIsChatOpen((prev) => !prev)} className="bg-white shadow-lg rounded-full p-2">
           <MessageSquare size={24} className="text-gray-800" />
         </button>
       </div>
@@ -123,10 +127,7 @@ export default function SessionPage() {
       {isChatOpen && (
         <div className="md:hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white w-11/12 max-w-md rounded-lg p-4">
-            <button
-              onClick={() => setIsChatOpen(false)}
-              className="ml-auto mb-2 text-gray-500 hover:text-gray-800"
-            >
+            <button onClick={() => setIsChatOpen(false)} className="ml-auto mb-2 text-gray-500 hover:text-gray-800">
               Close
             </button>
             <ChatBox chat={chat} currentUserId={currentUser.uid} onSend={handleSendMessage} />

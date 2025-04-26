@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.2",
+    "cookies-next": "^5.1.0",
     "firebase": "^11.6.0",
     "lucide-react": "^0.503.0",
     "next": "15.3.1",

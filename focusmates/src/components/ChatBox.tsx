@@ -18,8 +18,11 @@ export default function ChatBox({ chat, currentUserId, onSend }: ChatBoxProps) {
           try {
             const userRef = doc(db, "users", uid);
             const snapshot = await getDoc(userRef);
-            const name = snapshot.data()?.name;
-            updates[uid] = name?.trim() || "Unknown User";
+
+            console.log("User snapshot:", snapshot.data()); // Debugging
+
+            const displayName = snapshot.data()?.displayName;
+            updates[uid] = displayName?.trim() || "Unknown User";
           } catch {
             updates[uid] = "Unknown User";
           }
