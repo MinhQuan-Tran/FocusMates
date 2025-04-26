@@ -7,7 +7,7 @@ const currentUser = {
   displayName: "J.Monash",
   name: "J.Monash",
   degree: "Computer Science",
-  skills: ["JavaScript", "React"],
+  skills: ["JavaScript", "React", "Python"],
   streak: 7,
   points: 180,
 };
@@ -55,6 +55,15 @@ const dummyUsers = [
     displayName: "Eve",
     degree: "Electrical Engineering",
     skills: ["C++", "Embedded Systems", "Python"],
+    streak: 2,
+    points: 80,
+  },
+  {
+    uid: "mock-user-6",
+    email: "user6@example.com",
+    displayName: "Alladin",
+    degree: "Information Technology",
+    skills: ["Python", "JavaScript", "React"],
     streak: 2,
     points: 80,
   },
@@ -161,20 +170,25 @@ export default function MatchPage() {
     <div
       style={{
         minHeight: "100vh",
-        background: "#f9f9ff",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "2rem",
+        background: `
+          linear-gradient(135deg,rgb(8, 44, 205) 0%,rgb(111, 206, 230) 100%),
+          url('https://www.transparenttextures.com/patterns/asfalt-light.png')
+        `,
+        backgroundBlendMode: 'overlay',
+        backgroundSize: 'cover',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '2rem'
       }}
     >
       <div
         style={{
           maxWidth: "1000px",
           width: "100%",
-          background: "#fff",
-          borderRadius: "12px",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+          background: "#f0f0f3",
+          borderRadius: "20px",
+          boxShadow: "inset 8px 8px 16pxrgb(213, 224, 183), inset -8px -8px 16pxrgb(255, 255, 255)",
           padding: "2rem",
         }}
       >
