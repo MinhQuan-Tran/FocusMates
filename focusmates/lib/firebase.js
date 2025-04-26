@@ -1,16 +1,18 @@
+/*
 // lib/firebase.js
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth }        from "firebase/auth";
-import { getFirestore }   from "firebase/firestore";
+//import { getAuth, connectAuthEmulator }  from "firebase/auth";
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 
+/*
 const firebaseConfig = {
-  apiKey:             process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain:         process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  databaseURL:        process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
-  projectId:          process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket:      process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId:  process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId:              process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  projectId:           process.env.focusmates,
+  apiKey:              process.env.AIzaSyBWYV6XOftoYlJQ5Io6Ygv5ksvXhh_SjlA,
+  authDomain:          process.env.focusmates.firebaseapp.com,
+  databaseURL:         process.env.https://focusmates-default-rtdb.asia-southeast1.firebasedatabase.app,
+  storageBucket:       process.env.focusmates.firebasestorage.app,
+  messagingSenderId:   process.env.290251176737,
+  appId:               process.env.1:290251176737:web:fb591e5b98b8014269dc60,
 };
 
 const app = !getApps().length
@@ -19,3 +21,47 @@ const app = !getApps().length
 
 export const auth = getAuth(app);
 export const db   = getFirestore(app);
+
+// In emulator mode (no-op if emulators aren’t running)
+if (process.env.NEXT_PUBLIC_FIREBASE_EMULATOR === "true") {
+  connectFirestoreEmulator(db, "127.0.0.1", 8080);
+  connectAuthEmulator(auth,    "http://127.0.0.1:9099", { disableWarnings: true });
+}
+*/
+/*
+const firebaseConfig = {
+  projectId: "focusmates",
+  apiKey: "local", 
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+connectFirestoreEmulator(db, "127.0.0.1", 8080);
+*/
+/*
+// Only connect to emulator when running locally or from a script
+if (process.env.NODE_ENV !== "production") {
+  connectFirestoreEmulator(db, "localhost", 8080);
+  // connectAuthEmulator(auth, "http://localhost:9099"); // if needed
+}
+
+
+export { db };
+
+*/
+
+import { initializeApp } from "firebase/app";
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+
+const firebaseConfig = {
+  projectId: "focusmates", // must match your emulator project
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// 👇 Connect to Firestore emulator
+connectFirestoreEmulator(db, "127.0.0.1", 8080);
+
+export { db };
