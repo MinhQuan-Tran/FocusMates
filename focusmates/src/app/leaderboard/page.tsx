@@ -1,20 +1,37 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { ref, onValue } from "firebase/database";
+import { rtdb } from '@/firebase'; // Your firebase.js config
+
 
 export default function LeaderboardsPage() {
-  const leaderboardData = [
-    { name: 'Alice', skill: 'Python, Math', sessions: 15 },
-    { name: 'Bob', skill: 'Marketing, Design', sessions: 12 },
-    { name: 'Charlie', skill: 'Math', sessions: 10 },
-    { name: 'David', skill: 'React', sessions: 8 },
-    { name: 'Eve', skill: 'Design', sessions: 6 },
-  ];
+  const [leaderboardData, setLeaderboardData] = useState([]);
+
+  useEffect(() => {
+    const usersRef = ref(rtdb, 'users');
+    onValue(usersRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const parsedData = Object.entries(data).map(([_, userInfo]) => ({
+          name: userInfo.username,
+          skill: userInfo.skills.join(', '),
+          sessions: userInfo.numberOfSessions,
+        }));
+
+        // Optional: sort by sessions descending
+        parsedData.sort((a, b) => b.sessions - a.sessions);
+
+        setLeaderboardData(parsedData);
+      }
+    });
+  }, []);
 
   return (
-    <div className="bg-focusmate w-full min-h-screen flex flex-col items-center justify-center px-4">
-      <main className="max-w-3xl w-full text-center space-y-8">
+    <div className="bg-focusmate w-full h-screen flex flex-col items-center justify-center px-4">
+    <main className="max-w-3xl w-full text-center space-y-8 overflow-y-auto h-[90vh] p-4">
+
 
         {/* Heading */}
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
@@ -52,11 +69,12 @@ export default function LeaderboardsPage() {
 
         {/* Back to home link */}
         <Link
-          href="/"
-          className="inline-block mt-8 bg-primary text-white px-6 py-2 rounded-full font-medium hover:bg-primary/90 transition"
+        href="/"
+        className="float-right mt-8 bg-primary text-white px-6 py-2 rounded-full font-medium hover:bg-primary/90 transition"
         >
-          ⬅️Back to Home
+        ⬅️Back to Home
         </Link>
+
       </main>
     </div>
   );
