@@ -2,12 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../../src/firebase"; // Adjust if needed
-import { useAuth } from "../../context/AuthContext"
+// import { useAuth } from "../../context/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,8 +24,12 @@ export default function LoginPage() {
         await signInWithEmailAndPassword(auth, email, password);
       }
       router.push("/dashboard");
-    } catch (err: any) {
-      setError(err.message || "Something went wrong");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong");
+      }
     }
   };
 
@@ -41,7 +42,7 @@ export default function LoginPage() {
         background: "#fff",
         borderRadius: "12px",
         boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-        fontFamily: "Poppins, sans-serif",
+        fontFamily: "Poppins, sans-serif"
       }}
     >
       <div style={{ display: "flex", alignItems: "center", marginBottom: "1rem" }}>
@@ -59,19 +60,11 @@ export default function LoginPage() {
         </svg>
       </div>
 
-      <h1 style={{ fontSize: "1.8rem", marginBottom: "1rem", color: "#2F2F2F" }}>
-        {isSignUp ? "Sign Up" : "Sign In"}
-      </h1>
+      <h1 style={{ fontSize: "1.8rem", marginBottom: "1rem", color: "#2F2F2F" }}>{isSignUp ? "Sign Up" : "Sign In"}</h1>
 
       <form onSubmit={handleAuth}>
         <label style={labelStyle}>Email</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          style={inputStyle}
-        />
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={inputStyle} />
 
         <label style={labelStyle}>Password</label>
         <input
@@ -99,7 +92,7 @@ export default function LoginPage() {
             color: "#2ecc71",
             textDecoration: "underline",
             cursor: "pointer",
-            padding: 0,
+            padding: 0
           }}
         >
           {isSignUp ? "Sign In" : "Sign Up"}
@@ -115,7 +108,7 @@ const labelStyle = {
   fontWeight: 500,
   fontSize: "0.95rem",
   marginTop: "0.75rem",
-  display: "block",
+  display: "block"
 } as const;
 
 const inputStyle = {
@@ -128,7 +121,7 @@ const inputStyle = {
   marginTop: "0.3rem",
   marginBottom: "1rem",
   backgroundColor: "#f8f8f8",
-  color: "#2F2F2F",
+  color: "#2F2F2F"
 } as const;
 
 const buttonStyle = {
@@ -140,5 +133,5 @@ const buttonStyle = {
   border: "none",
   borderRadius: "8px",
   cursor: "pointer",
-  width: "100%",
+  width: "100%"
 } as const;
