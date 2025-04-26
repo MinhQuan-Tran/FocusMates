@@ -8,8 +8,8 @@ const currentUser = {
   name: "J.Monash",
   degree: "Computer Science",
   skills: ["JavaScript", "React", "Python"],
-  streak: 7,
-  points: 180,
+  streak: 16,
+  points: 1000,
 };
 
 const dummyUsers = [
@@ -69,7 +69,7 @@ const dummyUsers = [
   },
 ];
 
-// Renders a star rating out of 5
+// Star rating out of 5
 const renderStars = (count) => {
   return [...Array(5)].map((_, i) => (
     <span key={i} style={{ color: i < count ? "gold" : "#ddd", fontSize: "1.2rem" }}>
@@ -139,12 +139,20 @@ export default function MatchPage() {
           </span>
         ))}
       </p>
-      {!isCurrentUser && (
-        <>
-          <p style={{ margin: "0.3rem 0" }}>Streak: {user.streak}</p>
-          <p style={{ margin: "0.3rem 0" }}>Points: {user.points}</p>
-          <div style={{ marginTop: "0.5rem" }}>
-            <div>Compatibility: {renderStars(user.stars)}</div>
+
+      {/* Always show streak & points */}
+      <div style={{ marginTop: "1rem" }}>
+        <p style={{ margin: "0.3rem 0", fontWeight: isCurrentUser ? "" : "normal" }}>
+          Streak: {user.streak}
+        </p>
+        <p style={{ margin: "0.3rem 0", fontWeight: isCurrentUser ? "" : "normal" }}>
+          Points: {user.points}
+        </p>
+
+        {/* Only show compatibility & Connect button for others */}
+        {!isCurrentUser && (
+          <>
+            <div style={{ marginTop: "0.5rem" }}>Compatibility: {renderStars(user.stars)}</div>
             <button
               onClick={() => alert(`Connecting with ${user.displayName}…`)}
               style={{
@@ -160,9 +168,9 @@ export default function MatchPage() {
             >
               Connect
             </button>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </div>
     </div>
   );
 
@@ -171,15 +179,15 @@ export default function MatchPage() {
       style={{
         minHeight: "100vh",
         background: `
-          linear-gradient(135deg,rgb(8, 44, 205) 0%,rgb(111, 206, 230) 100%),
+          linear-gradient(135deg, rgb(8, 44, 205) 0%, rgb(111, 206, 230) 100%),
           url('https://www.transparenttextures.com/patterns/asfalt-light.png')
         `,
-        backgroundBlendMode: 'overlay',
-        backgroundSize: 'cover',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '2rem'
+        backgroundBlendMode: "overlay",
+        backgroundSize: "cover",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "2rem",
       }}
     >
       <div
@@ -188,11 +196,18 @@ export default function MatchPage() {
           width: "100%",
           background: "#f0f0f3",
           borderRadius: "20px",
-          boxShadow: "inset 8px 8px 16pxrgb(213, 224, 183), inset -8px -8px 16pxrgb(255, 255, 255)",
+          boxShadow: "inset 8px 8px 16px #d1d9e6, inset -8px -8px 16px #ffffff",
           padding: "2rem",
         }}
       >
-        <h1 style={{ textAlign: "center", fontSize: "2rem", fontWeight: "bold", marginBottom: "2rem" }}>
+        <h1
+          style={{
+            textAlign: "center",
+            fontSize: "2rem",
+            fontWeight: "bold",
+            marginBottom: "2rem",
+          }}
+        >
           Find a Study Partner
         </h1>
 
